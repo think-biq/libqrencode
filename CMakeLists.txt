@@ -2,7 +2,10 @@ cmake_minimum_required(VERSION 3.2)
 
 project(QRencode VERSION 4.1.1 LANGUAGES C)
 
-#configure_file("${CMAKE_CURRENT_SOURCE_DIR}"/config.h.in)
+if (NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE "Release" CACHE PATH "" FORCE)
+endif()
+
 add_definitions(
     -DSTATIC_IN_RELEASE=static
     -DQR_MAJOR_VERSION=4
