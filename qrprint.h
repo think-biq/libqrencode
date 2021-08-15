@@ -36,4 +36,4 @@
 * @param version Version of QR code.
 * @param casesensitive If text should be treated case-sensitive.
 */
-extern void QRprint_utf8(const FILE* out, const char* text, QRecLevel quality, int version, int casesensitive);
+extern void QRprint_utf8(FILE* out, const char* text, QRecLevel quality, int version, int casesensitive);

@@ -124,7 +124,7 @@ static int writeUTF8(FILE *fp, const QRcode *qrcode, int use_ansi, int invert, i
     return 0;
 }
 
-void QRprint_utf8(const FILE* out, const char* text, QRecLevel quality, int version, int casesensitive)
+void QRprint_utf8(FILE* out, const char* text, QRecLevel quality, int version, int casesensitive)
 {
     QRcode* code = QRcode_encodeString(
         text,
