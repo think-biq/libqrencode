@@ -24,7 +24,7 @@
     ^^
 */
 
-#include <qrprint.h>
+#include "qrprint.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -136,5 +136,5 @@ void QRprint_utf8(const FILE* out, const char* text, QRecLevel quality, int vers
 
     writeUTF8(out, code, 0, 0, 0);
 
-    free(Code);
+    free(code);
 }

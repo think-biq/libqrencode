@@ -24,7 +24,7 @@
     ^^
 */
 
-#include <qrencode.h>
+#include "qrencode.h"
 #include <stdio.h>
 
 /**
@@ -36,4 +36,4 @@
 * @param version Version of QR code.
 * @param casesensitive If text should be treated case-sensitive.
 */
-void QRprint_utf8(const FILE* out, const char* text, QRecLevel quality, int version, int casesensitive);
+extern void QRprint_utf8(const FILE* out, const char* text, QRecLevel quality, int version, int casesensitive);
