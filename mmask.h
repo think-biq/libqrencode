@@ -22,6 +22,8 @@
 #ifndef MMASK_H
 #define MMASK_H
 
+#include "qrcommon.h"
+
 extern unsigned char *MMask_makeMask(int version, unsigned char *frame, int mask, QRecLevel level);
 extern unsigned char *MMask_mask(int version, unsigned char *frame, QRecLevel level);
 
@@ -30,5 +32,19 @@ extern int MMask_evaluateSymbol(int width, unsigned char *frame);
 extern void MMask_writeFormatInformation(int version, int width, unsigned char *frame, int mask, QRecLevel level);
 extern unsigned char *MMask_makeMaskedFrame(int width, unsigned char *frame, int mask);
 #endif
+
+#define MMASKMAKER(__exp__) \
+	int x, y;\
+\
+	for(y = 0; y < width; y++) {\
+		for(x = 0; x < width; x++) {\
+			if(*s & 0x80) {\
+				*d = *s;\
+			} else {\
+				*d = *s ^ ((__exp__) == 0);\
+			}\
+			s++; d++;\
+		}\
+	}
 
 #endif /* MMASK_H */

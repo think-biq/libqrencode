@@ -1,6 +1,15 @@
-cmake_minimum_required(VERSION 3.1.0)
+cmake_minimum_required(VERSION 3.2)
 
 project(QRencode VERSION 4.1.1 LANGUAGES C)
+
+#configure_file("${CMAKE_CURRENT_SOURCE_DIR}"/config.h.in)
+add_definitions(
+    -DSTATIC_IN_RELEASE=static
+    -DQR_MAJOR_VERSION=4
+    -DQR_MINOR_VERSION=4
+    -DQR_MICRO_VERSION=1
+    -DQR_VERSION=4.4.1
+    -DHAVE_CONFIG_H=0)
 
 option(WITH_TOOLS "Build utility tools"  YES )
 option(WITH_TESTS "Build tests"  NO )
@@ -44,11 +53,12 @@ check_include_file(sys/time.h HAVE_SYS_TIME_H)
 check_include_file(time.h     HAVE_TIME_H    )
 check_include_file(pthread.h  HAVE_PTHREAD_H )
 
-check_function_exists(strdup HAVE_STRDUP)
-
-if(HAVE_STRDUP)
-    add_definitions(-DHAVE_STRDUP=1)
+if(MSVC)
+    add_definitions(-DSTRDUP=_strdup)
+else()
+    add_definitions(-DSTRDUP=strdup)
 endif()
+
 
 if(CMAKE_COMPILER_IS_GNUCXX)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
@@ -134,68 +144,3 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/qrencode.1 DESTINATION ${CMAKE_INSTALL
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libqrencode.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
 install(FILES qrencode.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 install(TARGETS qrencode DESTINATION ${CMAKE_INSTALL_LIBDIR})
-
-## Build utility tools
-if(WITH_TOOLS)
-    if(NOT WITHOUT_PNG)
-        add_definitions(-DHAVE_PNG=1)
-    endif()
-    add_executable(qrenc qrenc.c)
-    set_target_properties(qrenc PROPERTIES OUTPUT_NAME qrencode)
-
-    if(NOT WITHOUT_PNG)
-        target_link_libraries(qrenc qrencode PNG::PNG)
-    else()
-        target_link_libraries(qrenc qrencode)
-    endif()
-
-    if(MSVC)
-        target_link_libraries(qrenc ${GETOPT_LIBRARIES})
-    endif(MSVC)
-
-    install(TARGETS qrenc DESTINATION ${CMAKE_INSTALL_BINDIR})
-endif()
-
-if(WITH_TESTS)
-    enable_testing()
-    add_definitions(-DWITH_TESTS=)
-    add_definitions(-DSTATIC_IN_RELEASE=)
-    add_subdirectory(tests)
-else()
-    add_definitions(-DSTATIC_IN_RELEASE=static)
-endif()
-
-## ==============================================================================
-##
-##  Configuration summary
-##
-## ==============================================================================
-
-message(STATUS "------------------------------------------------------------" )
-message(STATUS "[QRencode] Configuration summary."                            )
-message(STATUS "------------------------------------------------------------ ")
-message(STATUS " System configuration:"                                       )
-message(STATUS " .. Processor type .............. = ${CMAKE_SYSTEM_PROCESSOR}")
-message(STATUS " .. CMake executable ............ = ${CMAKE_COMMAND}"         )
-message(STATUS " .. CMake version ............... = ${CMAKE_VERSION}"         )
-message(STATUS " .. System name ................. = ${CMAKE_SYSTEM}"          )
-message(STATUS " .. C++ compiler ................ = ${CMAKE_CXX_COMPILER}"    )
-message(STATUS " .. C compiler .................. = ${CMAKE_C_COMPILER}"      )
-message(STATUS " .. size(void*) ................. = ${CMAKE_SIZEOF_VOID_P}"   )
-message(STATUS " Dependencies:"                                               )
-#message(STATUS " .. Doxygen ..................... = ${DOXYGEN_EXECUTABLE}"    )
-message(STATUS " .. Thread library of the system  = ${CMAKE_THREAD_LIBS_INIT}")
-message(STATUS " .. Iconv ....................... = ${ICONV_FOUND}"           )
-message(STATUS " .... Iconv includes ............ = ${ICONV_INCLUDE_DIR}"     )
-message(STATUS " .... Iconv library ............. = ${ICONV_LIBRARIES}"       )
-message(STATUS " .. ZLIB ........................ = ${ZLIB_FOUND}"            )
-message(STATUS " .. PNG ......................... = ${PNG_FOUND}"             )
-message(STATUS " .... PNG includes .............. = ${PNG_INCLUDE_DIR}"       )
-message(STATUS " .... PNG library ............... = ${PNG_LIBRARIES}"         )
-#message(STATUS " .. Memory checker .............. = ${MEMORYCHECK_COMMAND}"   )
-message(STATUS " Project configuration:"                                      )
-message(STATUS " .. Build test programs  ........ = ${WITH_TESTS}"            )
-message(STATUS " .. Build utility tools  ........ = ${WITH_TOOLS}"            )
-message(STATUS " .. Disable PNG support  ........ = ${WITHOUT_PNG}"           )
-message(STATUS " .. Installation prefix ......... = ${CMAKE_INSTALL_PREFIX}"  )
-message(STATUS "------------------------------------------------------------ ")

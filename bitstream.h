@@ -22,6 +22,8 @@
 #ifndef BITSTREAM_H
 #define BITSTREAM_H
 
+#include <stddef.h>
+
 typedef struct {
 	size_t length;
 	size_t datasize;

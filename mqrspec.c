@@ -25,6 +25,8 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include "mqrspec.h"
+
 #if HAVE_CONFIG_H
 # include "config.h"
 #endif
@@ -33,7 +35,6 @@
 #include <string.h>
 #include <errno.h>
 
-#include "mqrspec.h"
 
 /******************************************************************************
  * Version and capacity
@@ -89,7 +90,7 @@ int MQRspec_getWidth(int version)
 /**
  * See Table 3 (pp.107) of Appendix 1, JIS X0510:2004.
  */
-static const int lengthTableBits[4][4] = {
+static const int mLengthTableBits[4][4] = {
 	{ 3, 4, 5, 6},
 	{ 0, 3, 4, 5},
 	{ 0, 0, 4, 5},
@@ -98,7 +99,7 @@ static const int lengthTableBits[4][4] = {
 
 int MQRspec_lengthIndicator(QRencodeMode mode, int version)
 {
-	return lengthTableBits[mode][version - 1];
+	return mLengthTableBits[mode][version - 1];
 }
 
 int MQRspec_maximumWords(QRencodeMode mode, int version)
@@ -106,7 +107,7 @@ int MQRspec_maximumWords(QRencodeMode mode, int version)
 	int bits;
 	int words;
 
-	bits = lengthTableBits[mode][version - 1];
+	bits = mLengthTableBits[mode][version - 1];
 	words = (1 << bits) - 1;
 	if(mode == QR_MODE_KANJI) {
 		words *= 2; // the number of bytes is required
@@ -120,7 +121,7 @@ int MQRspec_maximumWords(QRencodeMode mode, int version)
  *****************************************************************************/
 
 /* See calcFormatInfo in tests/test_mqrspec.c */
-static const unsigned int formatInfo[4][8] = {
+static const unsigned int mFormatInfo[4][8] = {
 	{0x4445, 0x55ae, 0x6793, 0x7678, 0x06de, 0x1735, 0x2508, 0x34e3},
 	{0x4172, 0x5099, 0x62a4, 0x734f, 0x03e9, 0x1202, 0x203f, 0x31d4},
 	{0x4e2b, 0x5fc0, 0x6dfd, 0x7c16, 0x0cb0, 0x1d5b, 0x2f66, 0x3e8d},
@@ -128,7 +129,8 @@ static const unsigned int formatInfo[4][8] = {
 };
 
 /* See Table 10 of Appendix 1. (pp.115) */
-static const int typeTable[MQRSPEC_VERSION_MAX + 1][3] = {
+//static const int mqrSpecTypeTable[MQRSPEC_VERSION_MAX + 1][3] = {
+static const int mqrSpecTypeTable[][3] = {
 	{-1, -1, -1},
 	{ 0, -1, -1},
 	{ 1,  2, -1},
@@ -143,10 +145,10 @@ unsigned int MQRspec_getFormatInfo(int mask, int version, QRecLevel level)
 	if(mask < 0 || mask > 3) return 0;
 	if(version <= 0 || version > MQRSPEC_VERSION_MAX) return 0;
 	if(level == QR_ECLEVEL_H) return 0;
-	type = typeTable[version][level];
+	type = mqrSpecTypeTable[version][level];
 	if(type < 0) return 0;
 
-	return formatInfo[mask][type];
+	return mFormatInfo[mask][type];
 }
 
 /******************************************************************************
@@ -159,7 +161,7 @@ unsigned int MQRspec_getFormatInfo(int mask, int version, QRecLevel level)
  * @param width
  * @param ox,oy upper-left coordinate of the pattern
  */
-static void putFinderPattern(unsigned char *frame, int width, int ox, int oy)
+static void mPutFinderPattern(unsigned char *frame, int width, int ox, int oy)
 {
 	static const unsigned char finder[] = {
 		0xc1, 0xc1, 0xc1, 0xc1, 0xc1, 0xc1, 0xc1,
@@ -196,7 +198,7 @@ static unsigned char *MQRspec_createFrame(int version)
 
 	memset(frame, 0, (size_t)(width * width));
 	/* Finder pattern */
-	putFinderPattern(frame, width, 0, 0);
+	mPutFinderPattern(frame, width, 0, 0);
 	/* Separator */
 	p = frame;
 	for(y = 0; y < 7; y++) {

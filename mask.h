@@ -19,6 +19,8 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include "qrcommon.h"
+
 #ifndef MASK_H
 #define MASK_H
 
@@ -34,5 +36,31 @@ extern int Mask_evaluateSymbol(int width, unsigned char *frame);
 extern int Mask_writeFormatInformation(int width, unsigned char *frame, int mask, QRecLevel level);
 extern unsigned char *Mask_makeMaskedFrame(int width, unsigned char *frame, int mask);
 #endif
+
+/**
+ * Demerit coefficients.
+ * See Section 8.8.2, pp.45, JIS X0510:2004.
+ */
+#define N1 (3)
+#define N2 (3)
+#define N3 (40)
+#define N4 (10)
+
+#define MASKMAKER(__exp__) \
+	int x, y;\
+	int b = 0;\
+\
+	for(y = 0; y < width; y++) {\
+		for(x = 0; x < width; x++) {\
+			if(*s & 0x80) {\
+				*d = *s;\
+			} else {\
+				*d = *s ^ ((__exp__) == 0);\
+			}\
+			b += (int)(*d & 1);\
+			s++; d++;\
+		}\
+	}\
+	return b;
 
 #endif /* MASK_H */

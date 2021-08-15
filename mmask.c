@@ -19,6 +19,8 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include "mmask.h"
+
 #if HAVE_CONFIG_H
 # include "config.h"
 #endif
@@ -29,7 +31,6 @@
 
 #include "qrencode.h"
 #include "mqrspec.h"
-#include "mmask.h"
 
 STATIC_IN_RELEASE void MMask_writeFormatInformation(int version, int width, unsigned char *frame, int mask, QRecLevel level)
 {
@@ -51,44 +52,30 @@ STATIC_IN_RELEASE void MMask_writeFormatInformation(int version, int width, unsi
 	}
 }
 
-#define MASKMAKER(__exp__) \
-	int x, y;\
-\
-	for(y = 0; y < width; y++) {\
-		for(x = 0; x < width; x++) {\
-			if(*s & 0x80) {\
-				*d = *s;\
-			} else {\
-				*d = *s ^ ((__exp__) == 0);\
-			}\
-			s++; d++;\
-		}\
-	}
-
-static void Mask_mask0(int width, const unsigned char *s, unsigned char *d)
+static void MMask_mask0(int width, const unsigned char *s, unsigned char *d)
 {
-	MASKMAKER(y&1)
+	MMASKMAKER(y&1)
 }
 
-static void Mask_mask1(int width, const unsigned char *s, unsigned char *d)
+static void MMask_mask1(int width, const unsigned char *s, unsigned char *d)
 {
-	MASKMAKER(((y/2)+(x/3))&1)
+	MMASKMAKER(((y/2)+(x/3))&1)
 }
 
-static void Mask_mask2(int width, const unsigned char *s, unsigned char *d)
+static void MMask_mask2(int width, const unsigned char *s, unsigned char *d)
 {
-	MASKMAKER((((x*y)&1)+(x*y)%3)&1)
+	MMASKMAKER((((x*y)&1)+(x*y)%3)&1)
 }
 
-static void Mask_mask3(int width, const unsigned char *s, unsigned char *d)
+static void MMask_mask3(int width, const unsigned char *s, unsigned char *d)
 {
-	MASKMAKER((((x+y)&1)+((x*y)%3))&1)
+	MMASKMAKER((((x+y)&1)+((x*y)%3))&1)
 }
 
-#define maskNum (4)
-typedef void MaskMaker(int, const unsigned char *, unsigned char *);
-static MaskMaker *maskMakers[maskNum] = {
-	Mask_mask0, Mask_mask1, Mask_mask2, Mask_mask3
+#define mmaskNum (4)
+typedef void MMaskMaker(int, const unsigned char *, unsigned char *);
+static MMaskMaker *mmaskMakers[mmaskNum] = {
+	MMask_mask0, MMask_mask1, MMask_mask2, MMask_mask3
 };
 
 #ifdef WITH_TESTS
@@ -99,7 +86,7 @@ unsigned char *MMask_makeMaskedFrame(int width, unsigned char *frame, int mask)
 	masked = (unsigned char *)malloc((size_t)(width * width));
 	if(masked == NULL) return NULL;
 
-	maskMakers[mask](width, frame, masked);
+	mmaskMakers[mask](width, frame, masked);
 
 	return masked;
 }
@@ -110,7 +97,7 @@ unsigned char *MMask_makeMask(int version, unsigned char *frame, int mask, QRecL
 	unsigned char *masked;
 	int width;
 
-	if(mask < 0 || mask >= maskNum) {
+	if(mask < 0 || mask >= mmaskNum) {
 		errno = EINVAL;
 		return NULL;
 	}
@@ -119,7 +106,7 @@ unsigned char *MMask_makeMask(int version, unsigned char *frame, int mask, QRecL
 	masked = (unsigned char *)malloc((size_t)(width * width));
 	if(masked == NULL) return NULL;
 
-	maskMakers[mask](width, frame, masked);
+	mmaskMakers[mask](width, frame, masked);
 	MMask_writeFormatInformation(version, width, masked, mask, level);
 
 	return masked;
@@ -159,9 +146,9 @@ unsigned char *MMask_mask(int version, unsigned char *frame, QRecLevel level)
 	if(mask == NULL) return NULL;
 	bestMask = NULL;
 
-	for(i = 0; i < maskNum; i++) {
+	for(i = 0; i < mmaskNum; i++) {
 		score = 0;
-		maskMakers[i](width, frame, mask);
+		mmaskMakers[i](width, frame, mask);
 		MMask_writeFormatInformation(version, width, mask, i, level);
 		score = MMask_evaluateSymbol(width, mask);
 		if(score > maxScore) {

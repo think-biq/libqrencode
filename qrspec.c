@@ -25,6 +25,8 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include "qrspec.h"
+
 #if HAVE_CONFIG_H
 # include "config.h"
 #endif
@@ -33,7 +35,6 @@
 #include <string.h>
 #include <errno.h>
 
-#include "qrspec.h"
 #include "qrinput.h"
 
 /******************************************************************************

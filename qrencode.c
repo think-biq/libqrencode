@@ -18,6 +18,8 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include "qrencode.h"
+
 #if HAVE_CONFIG_H
 # include "config.h"
 #endif
@@ -26,7 +28,6 @@
 #include <string.h>
 #include <errno.h>
 
-#include "qrencode.h"
 #include "qrspec.h"
 #include "mqrspec.h"
 #include "bitstream.h"
@@ -479,7 +480,7 @@ STATIC_IN_RELEASE QRcode *QRcode_encodeMask(QRinput *input, int mask)
 		for(j = 0; j < 8; j++) {
 			p = FrameFiller_next(&filler);
 			if(p == NULL)  goto EXIT;
-			*p = 0x02 | ((bit & code) != 0);
+			*p = 0x02 | (unsigned char)((bit & code) != 0);
 			bit = bit >> 1;
 		}
 	}
@@ -573,7 +574,7 @@ STATIC_IN_RELEASE QRcode *QRcode_encodeMaskMQR(QRinput *input, int mask)
 		for(j = 0; j < length; j++) {
 			p = FrameFiller_next(&filler);
 			if(p == NULL) goto EXIT;
-			*p = 0x02 | ((bit & code) != 0);
+			*p = 0x02 | (unsigned char)((bit & code) != 0);
 			bit = bit >> 1;
 		}
 	}
@@ -910,6 +911,8 @@ QRcode_List *QRcode_encodeStringStructured(const char *string, int version, QRec
 	return QRcode_encodeDataStructuredReal((int)strlen(string), (unsigned char *)string, version, level, 0, hint, casesensitive);
 }
 
+#define StringifyRaw(Thing) #Thing
+
 /******************************************************************************
  * System utilities
  *****************************************************************************/
@@ -917,19 +920,19 @@ QRcode_List *QRcode_encodeStringStructured(const char *string, int version, QRec
 void QRcode_APIVersion(int *major_version, int *minor_version, int *micro_version)
 {
 	if(major_version != NULL) {
-		*major_version = MAJOR_VERSION;
+		*major_version = QR_MAJOR_VERSION;
 	}
 	if(minor_version != NULL) {
-		*minor_version = MINOR_VERSION;
+		*minor_version = QR_MINOR_VERSION;
 	}
 	if(micro_version != NULL) {
-		*micro_version = MICRO_VERSION;
+		*micro_version = QR_MICRO_VERSION;
 	}
 }
 
-char *QRcode_APIVersionString(void)
+const char *QRcode_APIVersionString(void)
 {
-	return VERSION;
+	return StringifyRaw(QR_VERSION);
 }
 
 void QRcode_clearCache(void)

@@ -19,6 +19,8 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include "bitstream.h"
+
 #if HAVE_CONFIG_H
 # include "config.h"
 #endif
@@ -26,7 +28,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "bitstream.h"
 
 #define DEFAULT_BUFSIZE (128)
 

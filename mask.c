@@ -19,6 +19,8 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include "mask.h"
+
 #if HAVE_CONFIG_H
 # include "config.h"
 #endif
@@ -29,7 +31,6 @@
 
 #include "qrencode.h"
 #include "qrspec.h"
-#include "mask.h"
 
 STATIC_IN_RELEASE int Mask_writeFormatInformation(int width, unsigned char *frame, int mask, QRecLevel level)
 {
@@ -73,32 +74,6 @@ STATIC_IN_RELEASE int Mask_writeFormatInformation(int width, unsigned char *fram
 
 	return blacks;
 }
-
-/**
- * Demerit coefficients.
- * See Section 8.8.2, pp.45, JIS X0510:2004.
- */
-#define N1 (3)
-#define N2 (3)
-#define N3 (40)
-#define N4 (10)
-
-#define MASKMAKER(__exp__) \
-	int x, y;\
-	int b = 0;\
-\
-	for(y = 0; y < width; y++) {\
-		for(x = 0; x < width; x++) {\
-			if(*s & 0x80) {\
-				*d = *s;\
-			} else {\
-				*d = *s ^ ((__exp__) == 0);\
-			}\
-			b += (int)(*d & 1);\
-			s++; d++;\
-		}\
-	}\
-	return b;
 
 static int Mask_mask0(int width, const unsigned char *s, unsigned char *d)
 {
