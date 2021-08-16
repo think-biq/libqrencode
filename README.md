@@ -10,6 +10,34 @@ be found at https://github.com/fukuchi/libqrencode
 
 Re-licensed under LGPL 3.0 from previous 2.1 as permitted by original author.
 
+## Changeset overview
+
+Added qrprint module, defining the function *QRprint_utf8*, for convenience.
+Namespaced masking data.
+
+### Usage example
+
+```c
+#include <stdlib.h>
+#include <stdio.h>
+#include <qrprint.h>
+
+int main(void)
+{
+    const char* text = "https://think-biq.com";
+    // Learn more about quality and version at https://www.qrcode.com/en/about/
+    QRecLevel quality = QR_ECLEVEL_L;
+    int version = 0;
+    int casesensitive = 1;
+
+    // Prints a UTF8 encoded QR code to stdout.
+    QRprint_utf8(stdout, text, quality, version, casesensitive);
+
+    return 0;
+}
+
+```
+
 ## Encoding
 
 There are two methods to encode data: <b>encoding a string/data</b> or
