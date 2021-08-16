@@ -24,7 +24,7 @@
     ^^
 */
 
-#include <qrprint.h>
+#include "qrprint.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -124,7 +124,7 @@ static int writeUTF8(FILE *fp, const QRcode *qrcode, int use_ansi, int invert, i
     return 0;
 }
 
-void QRprint_utf8(const FILE* out, const char* text, QRecLevel quality, int version, int casesensitive)
+void QRprint_utf8(FILE* out, const char* text, QRecLevel quality, int version, int casesensitive)
 {
     QRcode* code = QRcode_encodeString(
         text,
@@ -136,5 +136,5 @@ void QRprint_utf8(const FILE* out, const char* text, QRecLevel quality, int vers
 
     writeUTF8(out, code, 0, 0, 0);
 
-    free(Code);
+    free(code);
 }

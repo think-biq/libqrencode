@@ -7,7 +7,7 @@ if (NOT CMAKE_BUILD_TYPE)
 endif()
 
 add_definitions(
-    -DSTATIC_IN_RELEASE=static
+    -DSTATIC_IN_RELEASE=
     -DQR_MAJOR_VERSION=4
     -DQR_MINOR_VERSION=4
     -DQR_MICRO_VERSION=1
@@ -108,7 +108,8 @@ set(QRENCODE_SRCS qrencode.c
                   split.c
                   mask.c
                   mqrspec.c
-                  mmask.c)
+                  mmask.c
+                  qrprint.c)
 
 set(QRENCODE_HDRS qrencode_inner.h
                   qrinput.h
@@ -118,7 +119,8 @@ set(QRENCODE_HDRS qrencode_inner.h
                   split.h
                   mask.h
                   mqrspec.h
-                  mmask.h)
+                  mmask.h
+                  qrprint.h)
 
 if(BUILD_SHARED_LIBS)
     if(MSVC)
