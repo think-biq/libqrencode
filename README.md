@@ -8,7 +8,7 @@ be found at https://github.com/fukuchi/libqrencode
 
 ## License
 
-Re-licensed under LGPL 3.0 from previous 2.1 as permitted by original author.
+Re-licensed under LGPL 3.0 from previous 2.1 as permitted by the original author.
 
 ## Changeset overview
 
@@ -37,6 +37,8 @@ int main(void)
 }
 
 ```
+
+# Original Main Page
 
 ## Encoding
 
