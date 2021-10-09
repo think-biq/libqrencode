@@ -22,10 +22,13 @@ prepare:
 	@cmake -B $(BUILD_DIR) -D CMAKE_BUILD_TYPE=${BUILD_MODE} \
 		-D BUILD_SHARED_LIBS=${BUILD_SHARED_LIBS} -S $(PROJECT_DIR)
 
+stage: prepare
+	@(cd $(BUILD_DIR) && cmake ${TEST_FLAGS} -D CMAKE_BUILD_TYPE=${BUILD_MODE} -D BUILD_SHARED_LIBS=ON ..)
+
 build:
 	@make -C "$(BUILD_DIR)"
 
-docs: clean-docs
+docs: clean-docs icon
 	doxygen docs/doxygen.cfg > docs/doxygen.log 2> docs/doxygen.err.log
 
 open-docs:
@@ -35,4 +38,8 @@ clean-docs:
 	rm -rf docs/{html,latex}
 	rm -f docs/doxygen*.log
 
-all: prepare build
+icon: prepare
+	convert -background white -fill black \
+	  -size 128x64 -gravity center label:".:* qrencode *:." "$(PROJECT_DIR)/docs/icon.png"
+
+all: stage build
